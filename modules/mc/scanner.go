@@ -159,10 +159,10 @@ func (s *Scanner) Scan(target zgrab2.ScanTarget) (zgrab2.ScanStatus, interface{}
 	}
 
 	if length > 32800 {
-		return zgrab2.TryGetScanStatus(errors.New("banner too long")), nil, errors.New("banner too long")
+		return zgrab2.SCAN_PROTOCOL_ERROR, nil, errors.New("banner too long")
 	}
 	if length < 1 {
-		return zgrab2.TryGetScanStatus(errors.New("zero/negative banner length")), nil, errors.New("zero/negative banner length")
+		return zgrab2.SCAN_PROTOCOL_ERROR, nil, errors.New("zero/negative banner length")
 	}
 
 	data := make([]byte, length)
@@ -173,7 +173,7 @@ readLoop:
 	for totalRead < length {
 		select {
 		case <-timeout:
-			return zgrab2.TryGetScanStatus(errors.New("read timeout")), nil, errors.New("read timeout")
+			return zgrab2.SCAN_PROTOCOL_ERROR, nil, errors.New("read timeout")
 		default:
 			n, err := conn.Read(data[totalRead:])
 			if err != nil && err != io.EOF {
@@ -197,7 +197,7 @@ readLoop:
 	}
 
 	if length != 9 {
-		return zgrab2.TryGetScanStatus(errors.New("banner length mismatch")), nil, errors.New("banner length mismatch")
+		return zgrab2.SCAN_PROTOCOL_ERROR, nil, errors.New("banner length mismatch")
 	}
 
 	data2 := make([]byte, length)
@@ -208,7 +208,7 @@ readLoop2:
 	for totalRead < length {
 		select {
 		case <-timeout:
-			return zgrab2.TryGetScanStatus(errors.New("read timeout")), nil, errors.New("read timeout")
+			return zgrab2.SCAN_PROTOCOL_ERROR, nil, errors.New("read timeout")
 		default:
 			n, err := conn.Read(data2[totalRead:])
 			if err != nil && err != io.EOF {
